@@ -4,7 +4,7 @@ require_once __DIR__ . '/include/TestPaths.php';
 
 /**
 * Load the page results directly from the results files
-* 
+*
 * @param mixed $id
 * @param mixed $testPath
 * @param mixed $run
@@ -12,7 +12,7 @@ require_once __DIR__ . '/include/TestPaths.php';
 */
 function loadAllPageData($testPath, $options = null) {
   $ret = array();
-  
+
   // go in order for the number of runs there are supposed to be
   if (is_file("$testPath/testinfo.ini")) {
     $ini = parse_ini_file("$testPath/testinfo.ini", true);
@@ -22,14 +22,14 @@ function loadAllPageData($testPath, $options = null) {
     $completed = true;
     if ($testInfo && (!array_key_exists('completed', $testInfo) || !$testInfo['completed']))
       $completed = false;
-      
+
     for( $run = 1; $run <= $runs; $run++ ) {
       // only load page data for individual runs that are complete (or if the whole test is complete)
       if ($completed || !$testInfo || IsTestRunComplete($run, $testInfo)) {
         $data = loadPageRunData($testPath, $run, 0, $options, $testInfo);
         if( isset($data) )
           $ret[$run][0] = $data;
-        
+
         if( !$fvonly ) {
           unset( $data );
           $data = loadPageRunData($testPath, $run, 1, $options, $testInfo);
@@ -39,7 +39,7 @@ function loadAllPageData($testPath, $options = null) {
       }
     }
   }
-  
+
   return $ret;
 }
 
@@ -73,7 +73,7 @@ function loadPageStepData($localPaths, $runCompleted, $options = null, $testInfo
   $ret = null;
   if (gz_is_file($cacheFile))
     $ret = json_decode(gz_file_get_contents($cacheFile), true);
-  
+
   if (!isset($ret) || !is_array($ret)) {
     $ret = loadPageData($localPaths->pageDataFile(), $options);
     if (!isset($ret) || !is_array($ret) || !count($ret))
@@ -85,7 +85,7 @@ function loadPageStepData($localPaths, $runCompleted, $options = null, $testInfo
     if (array_key_exists('basic', $_REQUEST) && $_REQUEST['basic'])
       $basic_results = true;
 
-    // Load any raw result data from the test    
+    // Load any raw result data from the test
     if (gz_is_file($localPaths->pageDataJsonFile())) {
       $pd = json_decode(gz_file_get_contents($localPaths->pageDataJsonFile()), true);
       if ($pd && is_array($pd) && count($pd)) {
@@ -196,10 +196,10 @@ function loadPageStepData($localPaths, $runCompleted, $options = null, $testInfo
           // Create top-level metrics for each as well
           foreach ($processing as $key => $value)
             $ret["cpu.$key"] = $value;
-          if (isset($ret['docTime']) && $ret['docTime']) {    
-            $processing = GetDevToolsCPUTimeForStep($localPaths, $ret['docTime']);    
-            if (isset($processing) && is_array($processing) && count($processing)) {    
-              $ret['cpuTimesDoc'] = $processing;      
+          if (isset($ret['docTime']) && $ret['docTime']) {
+            $processing = GetDevToolsCPUTimeForStep($localPaths, $ret['docTime']);
+            if (isset($processing) && is_array($processing) && count($processing)) {
+              $ret['cpuTimesDoc'] = $processing;
             }
           }
         }
@@ -233,7 +233,7 @@ function loadPageStepData($localPaths, $runCompleted, $options = null, $testInfo
         }
       }
     }
-    
+
     // For visual tests (black-box browser testing) use the visual metrics as the base timings
     if (isset($ret) &&
         isset($ret['visualTest']) &&
@@ -243,7 +243,7 @@ function loadPageStepData($localPaths, $runCompleted, $options = null, $testInfo
       $ret['docTime'] = $ret['visualComplete'];
       $ret['fullyLoaded'] = $ret['lastVisualChange'];
     }
-    
+
     // See if we have pcap-based versions of the various metrics
     if ((!isset($ret['bytesIn']) || !$ret['bytesIn']) && isset($ret['pcapBytesIn']) && $ret['pcapBytesIn'])
       $ret['bytesIn'] = $ret['pcapBytesIn'];
@@ -315,7 +315,7 @@ function loadPageStepData($localPaths, $runCompleted, $options = null, $testInfo
         $ret['error'] = $testInfo['errors'][$run][$cached];
       }
     }
-    
+
     if (isset($ret) && is_array($ret) && !$basic_results)
       gz_file_put_contents($cacheFile, json_encode($ret));
   }
@@ -325,7 +325,7 @@ function loadPageStepData($localPaths, $runCompleted, $options = null, $testInfo
 
 /**
 * Load the page data from the specified file
-* 
+*
 * @param mixed $file
 */
 function loadPageData($file, $options = null)
@@ -335,7 +335,7 @@ function loadPageData($file, $options = null)
     if( $lines)
     {
         // loop through each line in the file until we get a data record
-        foreach($lines as $linenum => $line) 
+        foreach($lines as $linenum => $line)
         {
             $parseLine = str_replace("\t", "\t ", $line);
             $fields = explode("\t", $parseLine);
@@ -420,7 +420,7 @@ function loadPageData($file, $options = null)
                 if ((isset($fields[104]) && strlen(trim($fields[104])))) $ret['visualComplete'] = intval(trim($fields[104]));
                 if ((isset($fields[105]) && strlen(trim($fields[105])))) $ret['SpeedIndex'] = intval(trim($fields[105]));
                 if ((isset($fields[106]) && strlen(trim($fields[106])))) $ret['certificate_bytes'] = intval(trim($fields[106]));
-                
+
                 $ret['date'] = strtotime(trim($fields[0]) . ' ' . trim($fields[1]));
                 if (!strlen($ret['pageSpeedVersion']))
                     $ret['pageSpeedVersion'] = '1.9';
@@ -429,20 +429,20 @@ function loadPageData($file, $options = null)
             }
         }
     }
-    
+
     return $ret;
 }
 
 /**
 * Find the median run and use it for the results
-* 
+*
 * @param mixed $pageData
 */
 function calculatePageStats(&$pageData, &$fv, &$rv)
 {
     $fvCount = 0;
     $rvCount = 0;
-    
+
     // calculate the averages
     if( count($pageData) ) {
         foreach( $pageData as $run => $data ) {
@@ -497,13 +497,13 @@ function calculatePageStats(&$pageData, &$fv, &$rv)
         }
     }
 
-    // calculate the first view stats    
+    // calculate the first view stats
     if( isset($fv) && isset($metrics) && $fvCount > 0 )
     {
         foreach ($metrics as $metric)
           if (is_numeric($fv[$metric]))
             $fv[$metric] /= (double)$fvCount;
-        
+
         // go through and find the run closest to the average
         $closest = -1;
         $distance = 10000000000;
@@ -520,18 +520,18 @@ function calculatePageStats(&$pageData, &$fv, &$rv)
                 }
             }
         }
-        
+
         if( $closest != -1 )
             $fv['avgRun'] = $closest;
     }
 
-    // calculate the repeat view stats    
+    // calculate the repeat view stats
     if( isset($rv) && isset($metrics) && $rvCount > 0 )
     {
         foreach ($metrics as $metric)
           if (is_numeric($rv[$metric]))
             $rv[$metric] /= (double)$rvCount;
-        
+
         // go through and find the run closest to the average
         $closest = -1;
         $distance = 10000000000;
@@ -548,7 +548,7 @@ function calculatePageStats(&$pageData, &$fv, &$rv)
                 }
             }
         }
-        
+
         if( $closest != -1 )
             $rv['avgRun'] = $closest;
     }
@@ -559,19 +559,19 @@ function calculatePageStats(&$pageData, &$fv, &$rv)
  * corresponding to the median (or lower of two middle values) of $metric,
  * unless the "medianRun" parameter is set to "fastest",
  * in which case it returns the index of the fastest run.
-* 
+*
 * @param mixed $pageData
 * @param mixed $cached
 */
-function GetMedianRun(&$pageData, $cached, $metric = 'loadTime') {
+function GetMedianRun(&$pageData, $cached, $metric = 'SpeedIndex') {
     $run = 0;
     $cached = $cached ? 1:0;
     $times = values($pageData, $cached, $metric, true);
-            
+
     if (!count($times)) {
       $times = values($pageData, $cached, $metric, false);
     }
-    
+
     $count = count($times);
     if( $count > 1 ) {
         asort($times);
@@ -595,18 +595,18 @@ function GetMedianRun(&$pageData, $cached, $metric = 'loadTime') {
             break;
         }
     }
-    
+
     // fall back to loadTime if we failed to get a run with the specified metric
-    if (!$run && $metric != 'loadTime') {
+    if (!$run && $metric != 'SpeedIndex') {
         $run = GetMedianRun($pageData, $cached);
     }
-    
+
     return $run;
 }
 
 /**
 * Count the number of tests with successful results
-* 
+*
 * @param mixed $pageData
 * @param mixed $cached
 */
@@ -618,13 +618,13 @@ function CountSuccessfulTests(&$pageData, $cached)
         if( successfulRun($run[$cached]) )
             $count++;
     }
-    
+
     return $count;
 }
 
 /**
 * Calculate some stats for the given metric from the page data
-* 
+*
 * @param mixed $pageData
 * @param mixed $cached
 * @param mixed $metric
@@ -640,7 +640,7 @@ function CalculateAggregateStats(&$pageData, $cached, $metric, &$median, &$avg, 
     $count = 0;
     $min = null;
     $max = null;
-    
+
     // first pass, calculate the average and array of values for grabbing the median
     $values = values($pageData, $cached, $metric, true);
     $sum = array_sum($values);
@@ -653,7 +653,7 @@ function CalculateAggregateStats(&$pageData, $cached, $metric, &$median, &$avg, 
         $median = $values[$medianIndex];
         $max = end($values);
         $min = reset($values);
-        
+
         // pass 2, calculate the standard deviation
         $sum = 0;
         foreach($values as $value){
@@ -661,13 +661,13 @@ function CalculateAggregateStats(&$pageData, $cached, $metric, &$median, &$avg, 
         }
         $stdDev = sqrt($sum / $count);
     }
-    
+
     return $count;
 }
 
 /**
 * Calculate the standard deviation for the provided metric
-* 
+*
 */
 function PageDataStandardDeviation($pageData, $metric, $cached) {
     $ret = null;
@@ -697,8 +697,8 @@ function PageDataStandardDeviation($pageData, $metric, $cached) {
 
 /**
  * Load the reported user timings data for the given run
- * 
- * @param array $pageData A reference to the pageData array to load the user timing data into 
+ *
+ * @param array $pageData A reference to the pageData array to load the user timing data into
  * @param mixed $userTimingFile
  */
 function loadUserTimingData(&$pageData, $userTimingFile) {

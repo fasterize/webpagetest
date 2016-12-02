@@ -1,21 +1,21 @@
 <?php
 /**
 * Send the test result beacon (to Show Slow instance)
-* 
+*
 * @param mixed $settings
 */
 function SendBeacon($beaconUrl, $id, $testPath, &$testInfo, &$pageData)
 {
     if( !$testInfo['private'] )
     {
-        $medianMetric = isset($testInfo['medianMetric']) ? $testInfo['medianMetric'] : 'loadTime';
+        $medianMetric = isset($testInfo['medianMetric']) ? $testInfo['medianMetric'] : 'SpeedIndex';
         $fvMedian = GetMedianRun($pageData, 0, $medianMetric);
         if( $fvMedian )
         {
-            $data = array(  'version' => VER_WEBPAGETEST, 
-                            'url' => FixUrlSlash($testInfo['url']), 
-                            'id' => $id, 
-                            'completed' => $testInfo['completed'], 
+            $data = array(  'version' => VER_WEBPAGETEST,
+                            'url' => FixUrlSlash($testInfo['url']),
+                            'id' => $id,
+                            'completed' => $testInfo['completed'],
                             'location' => $testInfo['location']);
             if( @strlen($testInfo['connectivity']) )
             {
@@ -30,13 +30,13 @@ function SendBeacon($beaconUrl, $id, $testPath, &$testInfo, &$pageData)
             }
             if( @strlen($testInfo['label']) )
                 $data['label'] = $testInfo['label'];
-            
+
             $data['first'] = $pageData[$fvMedian][0];
 
             $rvMedian = GetMedianRun($pageData, 1, $medianMetric);
             if( $rvMedian )
                 $data['repeat'] = $pageData[$rvMedian][1];
-                
+
             // send the actual http POST
             $postData = json_encode($data);
             $data_len = strlen($postData);
@@ -50,5 +50,5 @@ function SendBeacon($beaconUrl, $id, $testPath, &$testInfo, &$pageData)
             @file_get_contents($beaconUrl, 0, $ctx);
         }
     }
-}  
+}
 ?>

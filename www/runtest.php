@@ -141,7 +141,7 @@
                 strpos($test['traceCategories'], "\n") === false &&
                 trim($test['traceCategories']) != "*") {
               $test['traceCategories'] = $_REQUEST['traceCategories'];
-            }                                                                                                           
+            }
             $test['standards'] = $req_standards;
             $test['netlog'] = $req_netlog;
             $test['spdy3'] = $req_spdy3;
@@ -192,10 +192,10 @@
 
             if (array_key_exists('tsview_id', $_REQUEST)){
               $test['tsview_id'] = $_REQUEST['tsview_id'];
-              
+
               $protocol = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_SSL']) && $_SERVER['HTTP_SSL'] == 'On')) ? 'https' : 'http';
               $test['tsview_results_host'] = "{$protocol}://{$_SERVER['HTTP_HOST']}";
-             
+
               // tsview_configs format: KEY>VALUE,KEY>VALUE,......
               if (array_key_exists('tsview_configs', $_REQUEST))
                $test['tsview_configs'] = $_REQUEST['tsview_configs'];
@@ -313,7 +313,7 @@
             }
             if (isset($locations[$test['location']]['ami']))
               $test['ami'] = $locations[$test['location']]['ami'];
-            
+
             // set the browser to the default if one wasn't specified
             if ((!array_key_exists('browser', $test) ||
                  !strlen($test['browser'])) &&
@@ -357,7 +357,7 @@
             // login tests are forced to be private
             if( strlen($test['login']) )
                 $test['private'] = 1;
-                
+
             if (!$test['browser_width'] || !$test['browser_height']) {
               $browser_size = GetSetting('default_browser_size');
               if ($browser_size) {
@@ -372,7 +372,7 @@
                 }
               }
             }
-            
+
             // Tests that include credentials in the URL (usually indicated by @ in the host section) are forced to be private
             $atPos = strpos($test['url'], '@');
             if ($atPos !== false) {
@@ -409,7 +409,7 @@
                 else
                     $test['url'] .= '&atwExc=blank';
             }
-            
+
             // see if there are any custom metrics to extract
             if (is_dir('./settings/custom_metrics')) {
               $files = glob('./settings/custom_metrics/*.js');
@@ -480,7 +480,7 @@
                 unset($test['spam']);
             $test['priority'] =  0;
         }
-        
+
         if ($test['mobile'] && isset($test['mobileDevice']) && is_file('./settings/mobile_devices.ini')) {
           setcookie('mdev', $test['mobileDevice'], time()+60*60*24*365, '/');
           $devices = parse_ini_file('./settings/mobile_devices.ini', true);
@@ -496,7 +496,7 @@
               $test['uastring'] = $devices[$test['mobileDevice']]['ua'];
           }
         }
-        
+
         $test['created'] = time();
 
         // the API key requirements are for all test paths
@@ -589,7 +589,7 @@
                         UpdateLocation($testData, $locations, $location_string, $error);
                         if (strlen($error))
                           break;
-                          
+
                         $id = CreateTest($testData, $testData['url']);
                         if( isset($id) )
                             $test['tests'][] = array('url' => $test['url'], 'id' => $id);
@@ -982,7 +982,7 @@ function UpdateLocation(&$test, &$locations, $new_location, &$error)
 function ValidateKey(&$test, &$error, $key = null)
 {
   global $admin;
-  
+
   // load the secret key (if there is one)
   $secret = '';
   $keys = parse_ini_file('./settings/keys.ini', true);
@@ -1011,7 +1011,7 @@ function ValidateKey(&$test, &$error, $key = null)
     }elseif( isset($key) || (isset($test['key']) && strlen($test['key'])) ){
       if( isset($test['key']) && strlen($test['key']) && !isset($key) )
         $key = $test['key'];
-      
+
       // see if it was an auto-provisioned key
       if (preg_match('/^(?P<prefix>[0-9A-Za-z]+)\.(?P<key>[0-9A-Za-z]+)$/', $key, $matches)) {
         $prefix = $matches['prefix'];
@@ -1024,7 +1024,7 @@ function ValidateKey(&$test, &$error, $key = null)
             $keys[$key] = array('limit' => $info['key_limit']);
         }
       }
-      
+
       // validate their API key and enforce any rate limits
       if( array_key_exists($key, $keys) ){
         if (array_key_exists('default location', $keys[$key]) &&
@@ -1165,7 +1165,7 @@ function ValidateParameters(&$test, $locations, &$error, $destination_url = null
             // make sure on/off options are explicitly 1 or 0
             $test['private'] = $test['private'] ? 1 : 0;
             $test['web10'] = $test['web10'] ? 1 : 0;
-            $test['ignoreSSL'] = $test['ignoreSSL'] ? 1 : 0;
+            $test['ignoreSSL'] = 1;
             $test['tcpdump'] = $test['tcpdump'] ? 1 : 0;
             $test['standards'] = $test['standards'] ? 1 : 0;
             $test['timeline'] = $test['timeline'] ? 1 : 0;
@@ -1199,7 +1199,7 @@ function ValidateParameters(&$test, $locations, &$error, $destination_url = null
                 //    $loc = $locations[$def]['1'];
                 $test['location'] = $loc;
             }
-            
+
             // Use the default browser if one wasn't specified
             if ((!isset($test['browser']) || !strlen($test['browser'])) && isset($locations[$test['location']]['browser'])) {
               $browsers = explode(',', $locations[$test['location']]['browser']);
@@ -1214,12 +1214,12 @@ function ValidateParameters(&$test, $locations, &$error, $destination_url = null
             // see if we need to override the browser
             if( isset($locations[$test['location']]['browserExe']) && strlen($locations[$test['location']]['browserExe']))
                 $test['browserExe'] = $locations[$test['location']]['browserExe'];
-                
+
             // See if we need to force mobile emulation
             if (!$test['mobile'] && isset($locations[$test['location']]['force_mobile']) && $locations[$test['location']]['force_mobile'])
               $test['mobile'] = 1;
-            
-            // See if the location carries a timeout override 
+
+            // See if the location carries a timeout override
             if (!$test['timeout'] && isset($locations[$test['location']]['timeout']) && $locations[$test['location']]['timeout'] > 0)
               $test['timeout'] = intval($locations[$test['location']]['timeout']);
 
@@ -1459,7 +1459,7 @@ function ScriptParameterCount($command)
 * @param mixed $error
 */
 function ValidateURL(&$url, &$error, &$settings)
-{                
+{
     $ret = false;
 
     // make sure the url starts with http://
@@ -1832,7 +1832,7 @@ function CheckUrl($url)
       }
     }
   }
-  
+
   if ($ok && !$admin && !$usingAPI) {
     $ok = SBL_Check($url, $message);
     if (!$ok) {
@@ -2092,7 +2092,7 @@ function CreateTest(&$test, $url, $batch = 0, $batch_locations = 0)
         // log the test
         if (isset($testId)) {
           logTestMsg($testId, "Test Created");
-          
+
           // store the entire test data structure JSON encoded (instead of a bunch of individual files)
           $oldUrl = @$test['url'];
           $test['url'] = $url;
@@ -2444,14 +2444,14 @@ function ProcessTestScript($url, &$test) {
 /**
 * Break up the supplied command-line string and make sure it isn't using
 * invalid characters that may cause system issues.
-* 
+*
 * @param mixed $cmd
 * @param mixed $error
 */
 function ValidateCommandLine($cmd, &$error) {
   if (isset($cmd) && strlen($cmd)) {
     $flags = explode(' ', $cmd);
-    if ($flags && is_array($flags) && count($flags)) {                
+    if ($flags && is_array($flags) && count($flags)) {
       foreach($flags as $flag) {
         if (strlen($flag) && !preg_match('/^--(([a-zA-Z0-9\-\.\+=,_ "]+)|((data-reduction-proxy-http-proxies|proxy-server|proxy-pac-url|force-fieldtrials|force-fieldtrial-params|trusted-spdy-proxy|origin-to-force-quic-on|oauth2-refresh-token)=[a-zA-Z0-9\-\.\+=,_:\/"]+))$/', $flag)) {
           $error = 'Invalid command-line option: "' . htmlspecialchars($flag) . '"';

@@ -223,7 +223,7 @@ if (preg_match('/^[a-zA-Z0-9_]+$/', @$_REQUEST['test'])) {
     $id = $_COOKIE['tid'];
 }
 
-$median_metric = 'loadTime';
+$median_metric = 'SpeedIndex';
 $testLabel = '';
 if (strlen($id)) {
     if (@strlen($_REQUEST['rkey'])) {
@@ -294,11 +294,11 @@ if (strlen($id)) {
         if( isset($testDate) && strlen($testDate) )
             $testLabel .= " - $testDate";
     }
-    
+
     if (!isset($test)) {
         $test = array();
     }
-    
+
     if (!array_key_exists('testinfo', $test)) {
         $test['testinfo'] = array();
     }
