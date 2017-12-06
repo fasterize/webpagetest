@@ -1176,7 +1176,7 @@ function GetTestInfoHtml($includeScript = true)
     }
     if( isset($test['testinfo']) && strlen($test['testinfo']['script']) )
     {
-        $show = false;
+        $show = true;
         if ($includeScript) {
             $showscript = GetSetting('show_script_in_results');
             if ($admin || $showscript) {
